@@ -1,0 +1,8 @@
+configVersion: 1.0.0
+baseProjects:
+  default:
+    git: github.com/chill-cloud/base-project-default
+  go:
+    git: https://github.com/chill/base-project-go
+  python:
+    git: https://github.com/chill/base-project-python
