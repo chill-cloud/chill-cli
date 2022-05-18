@@ -61,7 +61,26 @@ type GitSource struct {
 }
 
 func (s *GitSource) GetVersions(c LocalCacheContext) ([]version.Version, error) {
-	panic("implement me")
+	target := s.GetPath(c)
+	q, err := vcs.RepoRootForImportPath(s.Remote, false)
+	if err != nil {
+		return nil, err
+	}
+	tagsList, err := q.VCS.Tags(target)
+	if err != nil {
+		return nil, err
+	}
+	var res []version.Version
+	for _, tag := range tagsList {
+		if strings.HasPrefix(tag, "chill-") {
+			v, err := version.ParseFromString(strings.TrimPrefix(tag, "chill-"))
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, *v)
+		}
+	}
+	return res, nil
 }
 
 type GitLocalSource struct {
@@ -87,7 +106,11 @@ func (s *GitSource) Update(c LocalCacheContext) error {
 		return err
 	}
 	if stat, err := os.Stat(target); err == nil && stat.IsDir() {
-		err := q.VCS.Download(target)
+		err := q.VCS.TagSync(target, "")
+		if err != nil {
+			return err
+		}
+		err = q.VCS.Download(target)
 		if err != nil {
 			return err
 		}
