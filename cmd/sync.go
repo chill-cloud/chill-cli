@@ -177,7 +177,7 @@ func RunSync(cmd *cobra.Command, args []string) error {
 		case service.StageMajor:
 			v := versionSet.GetLatestVersion(constraint.Any())
 			cfg.CurrentVersion = version.New(v.GetMajor()+1, 0, 0)
-			if !cfg.BaseVersion.MayBeNext(v) {
+			if !cfg.BaseVersion.MayBeNext(cfg.CurrentVersion) {
 				println(
 					"WARNING! It looks like somebody increased a major version before you did.\n" +
 						"It is an unusual situation, and is a sign that development process is out of sync.\n" +
