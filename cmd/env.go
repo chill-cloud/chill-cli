@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/service/naming"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ func RunEnv(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		name = args[0]
 	} else {
-		cwd, err := util.SetupCwd(Cwd)
+		cwd, err := cwd.SetupCwd(Cwd)
 		if err != nil {
 			return err
 		}
@@ -33,13 +33,10 @@ func RunEnv(cmd *cobra.Command, args []string) error {
 // envCmd represents the env command
 var envCmd = &cobra.Command{
 	Use:   "env",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Prints environment variable name with a dependency address",
+	Long: `This command prints environment variable name
+with a dependency address to be used inside the service code.
+`,
 	RunE: RunEnv,
 }
 

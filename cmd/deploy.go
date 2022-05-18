@@ -6,6 +6,7 @@ import (
 	"github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	cwd2 "github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/logging"
 	"github.com/chill-cloud/chill-cli/pkg/service/naming"
 	util "github.com/chill-cloud/chill-cli/pkg/util"
@@ -24,7 +25,7 @@ import (
 )
 
 func RunDeploy(cmd *cobra.Command, args []string) error {
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd2.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}
@@ -299,14 +300,8 @@ var lockTimeout int
 // deployCmd represents the deploy command
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	RunE: RunDeploy,
+	Short: "Deploys your service into the cluster",
+	RunE:  RunDeploy,
 }
 
 func init() {

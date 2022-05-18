@@ -55,7 +55,7 @@ func SecretToMountPath(key string) string {
 func capitalizeFirst(s string) string {
 	r := []rune(s)
 	r[0] = unicode.ToUpper(r[0])
-	return s
+	return string(r)
 }
 
 func Merge(parts []string, delimiter string, mode MergeMode) string {

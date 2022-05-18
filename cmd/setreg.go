@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
 	"github.com/chill-cloud/chill-cli/pkg/config"
-	"github.com/chill-cloud/chill-cli/pkg/util"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/spf13/cobra"
 	"path/filepath"
 )
 
 func RunSetReg(cmd *cobra.Command, args []string) error {
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}
@@ -70,15 +70,11 @@ var infix string
 
 // setregCmd represents the setreg command
 var setregCmd = &cobra.Command{
-	Use:   "setreg",
+	Use:   "setreg <server> <login> <password>",
 	Args:  cobra.MinimumNArgs(3),
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Sets container registry for this service",
+	Long: `Sets container registry for this service, and also
+saves its credentials into the cluster`,
 	RunE: RunSetReg,
 }
 
@@ -86,14 +82,4 @@ func init() {
 	rootCmd.AddCommand(setregCmd)
 
 	setregCmd.Flags().StringVarP(&infix, "infix", "i", "", "Image infix")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setregCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setregCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

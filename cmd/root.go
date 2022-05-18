@@ -11,27 +11,9 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "chill-cli",
-	Short: "CLI for Chill backend as a service platform",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:          "chill-cli",
+	Short:        "CLI for Chill backend as a service platform",
 	SilenceUsage: true,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
-}
-
-type BaseProject struct {
-	Git string
-}
-
-type ChillCLIConfig struct {
-	ConfigVersion string
-	BaseProjects  map[string]BaseProject
 }
 
 var Cwd string
@@ -47,12 +29,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.chill-cli.yaml)")
-
 	var v bool
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
@@ -70,9 +46,6 @@ func init() {
 		logging.Logger.Info("Verbose logging enabled")
 		return nil
 	}
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolVarP(&v, "verbose", "v", false, "Enable detailed logging")
 	rootCmd.PersistentFlags().BoolVarP(&ForceLocal, "local", "l", false, "Force enable local mode")
 	rootCmd.PersistentFlags().StringVar(&Cwd, "cwd", "", "Force set project directory")

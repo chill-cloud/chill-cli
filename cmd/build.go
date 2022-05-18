@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/logging"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"github.com/docker/docker/api/types"
 	docker "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
@@ -20,13 +20,10 @@ import (
 // buildCmd represents the build command
 var buildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Builds an image of the service",
+	Long: `This command connects to the Docker daemon and tries to build
+your image declared in image/Dockerfile, then, if successful, 
+marks it with a tag of the current version.`,
 	RunE: RunBuild,
 }
 
@@ -41,7 +38,7 @@ func GetContext(filePath string) (io.Reader, error) {
 
 func RunBuild(cmd *cobra.Command, args []string) error {
 
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}

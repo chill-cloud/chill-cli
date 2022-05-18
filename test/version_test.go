@@ -2,7 +2,6 @@ package test
 
 import (
 	"github.com/chill-cloud/chill-cli/pkg/version"
-	"net/url"
 	"testing"
 )
 
@@ -44,7 +43,4 @@ func TestVersions(t *testing.T) {
 	if err == nil {
 		t.Fatal("Wrong version parsed (negative values)")
 	}
-
-	a, e := url.Parse("asd.qwe.ghcr.io/ing/vv")
-	t.Log(a, e)
 }

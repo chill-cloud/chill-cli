@@ -37,6 +37,7 @@ type IncrementalConfig interface {
 type ProjectConfig struct {
 	Name           string
 	Registry       string
+	Clients        map[string]string
 	BaseVersion    *version.Version
 	CurrentVersion *version.Version
 	Stage          Stage

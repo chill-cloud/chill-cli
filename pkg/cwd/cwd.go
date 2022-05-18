@@ -1,4 +1,4 @@
-package util
+package cwd
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"github.com/chill-cloud/chill-cli/pkg/config"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func SetupCwd(cwd string) (string, error) {
@@ -16,9 +17,9 @@ func SetupCwd(cwd string) (string, error) {
 	if cwd != "" {
 		return filepath.Join(d, cwd), nil
 	}
-	l := filepath.SplitList(d)
+	l := strings.Split(d, string(os.PathSeparator))
 	for i := len(l); i >= 0; i-- {
-		_, err := os.Stat(filepath.Join(append(l[:i], config.ProjectConfigName)...))
+		_, err := os.Stat(strings.Join(append(l[:i], config.ProjectConfigName), string(os.PathSeparator)))
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				continue
@@ -26,7 +27,7 @@ func SetupCwd(cwd string) (string, error) {
 				return "", err
 			}
 		} else {
-			res := filepath.Join(l[:i]...)
+			res := strings.Join(l[:i], string(os.PathSeparator))
 			if i != len(l) {
 				println(fmt.Sprintf("Switched project directory to %s", res))
 			}

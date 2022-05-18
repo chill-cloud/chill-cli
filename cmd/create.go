@@ -89,23 +89,17 @@ func RunCreate(cmd *cobra.Command, args []string) error {
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
+	Use:   "create <name> [integration]",
 	Short: "Creates a new Chill service",
-	Long:  `Creates a new Chill service`,
-	Args:  cobra.MinimumNArgs(1),
-	RunE:  RunCreate,
+	Long: `Possible integrations for languages:
+
+go       Golang
+dart     Dart
+python   Python`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: RunCreate,
 }
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

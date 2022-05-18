@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type sccContext struct {
+type SccContext struct {
 	Adj     map[string][]string
 	Rev     map[string][]string
 	order   []string
@@ -18,7 +18,15 @@ type sccContext struct {
 	scc     []string
 }
 
-func (c *sccContext) dfsIn(v string) {
+func NewSccContext() *SccContext {
+	return &SccContext{
+		Adj:     map[string][]string{},
+		Rev:     map[string][]string{},
+		visited: map[string]bool{},
+	}
+}
+
+func (c *SccContext) dfsIn(v string) {
 	c.visited[v] = true
 	for _, u := range c.Adj[v] {
 		if !c.visited[u] {
@@ -28,7 +36,7 @@ func (c *sccContext) dfsIn(v string) {
 	c.order = append(c.order, v)
 }
 
-func (c *sccContext) dfsOut(v string) {
+func (c *SccContext) dfsOut(v string) {
 	c.visited[v] = true
 	c.scc = append(c.scc, v)
 	for _, u := range c.Rev[v] {
@@ -38,7 +46,7 @@ func (c *sccContext) dfsOut(v string) {
 	}
 }
 
-func (c *sccContext) findScc() [][]string {
+func (c *SccContext) FindScc() [][]string {
 	c.visited = map[string]bool{}
 	for v, _ := range c.Adj {
 		if !c.visited[v] {
@@ -97,8 +105,8 @@ func ValidateGraph(pc *service.ProjectConfig, c cache.LocalCacheContext, forceLo
 			rev[cfg.Name] = append(rev[cfg.Name], cur.Name)
 		}
 	}
-	ctx := sccContext{Adj: adj, Rev: rev}
-	res := ctx.findScc()
+	ctx := SccContext{Adj: adj, Rev: rev}
+	res := ctx.FindScc()
 	if len(res) != len(visited) {
 		var goodOne []string
 		for _, scc := range res {

@@ -40,6 +40,7 @@ type SerializedService struct {
 	Name           string                          `yaml:"name,omitempty"`
 	Registry       string                          `yaml:"registry,omitempty"`
 	Remote         string                          `yaml:"remote,omitempty"`
+	Clients        map[string]string               `yaml:"clients,omitempty"`
 	BaseVersion    string                          `yaml:"baseVersion,omitempty"`
 	CurrentVersion string                          `yaml:"currentVersion,omitempty"`
 	Stage          string                          `yaml:"stage"`
@@ -119,6 +120,7 @@ func ParseConfig(cwd string, file string, lock bool) (*service2.ProjectConfig, e
 	} else {
 		c.Integration = s.Integration
 	}
+	c.Clients = s.Clients
 
 	if stage, ok := stages[s.Stage]; ok {
 		c.Stage = stage
@@ -184,6 +186,7 @@ func ProcessConfig(c *service2.ProjectConfig) (*SerializedService, error) {
 	if c.BaseVersion != nil {
 		s.BaseVersion = c.BaseVersion.String()
 	}
+	s.Clients = c.Clients
 	s.Integration = c.Integration
 	if c.CurrentVersion != nil {
 		s.CurrentVersion = c.CurrentVersion.String()

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
 	"github.com/chill-cloud/chill-cli/pkg/config"
-	"github.com/chill-cloud/chill-cli/pkg/util"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,7 +25,7 @@ func RunStatus(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("unable to build Knative client")
 	}
 
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}
@@ -87,14 +87,8 @@ func RunStatus(cmd *cobra.Command, args []string) error {
 // statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	RunE: RunStatus,
+	Short: "Prints status of the current major deployment",
+	RunE:  RunStatus,
 }
 
 var Major int
@@ -103,14 +97,4 @@ func init() {
 	rootCmd.AddCommand(statusCmd)
 
 	statusCmd.Flags().IntVarP(&Major, "major", "m", 0, "Overrides major version defined in the lock file")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// statusCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// statusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

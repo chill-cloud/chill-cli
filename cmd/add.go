@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	service2 "github.com/chill-cloud/chill-cli/pkg/service"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"github.com/chill-cloud/chill-cli/pkg/version/constraint"
 	"github.com/chill-cloud/chill-cli/pkg/version/set"
 	"github.com/spf13/cobra"
@@ -47,7 +47,7 @@ func RunAddLocal(cmd *cobra.Command, args []string) error {
 }
 
 func runAddGeneric(src cache.CachedSource, version *string, f func(string, constraint.Constraint) service2.Dependency) error {
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}
@@ -126,13 +126,7 @@ func runAddGeneric(src cache.CachedSource, version *string, f func(string, const
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Adds another service as a dependency",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Use one of the subcommands")
 	},
@@ -141,25 +135,13 @@ to quickly create a Cobra application.`,
 var addRemoteCmd = &cobra.Command{
 	Use:   "remote <remote_path>",
 	Short: "Adds remote dependency",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	RunE: RunAddRemote,
+	RunE:  RunAddRemote,
 }
 
 var addLocalCmd = &cobra.Command{
 	Use:   "local <local_path>",
 	Short: "Adds local dependency",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	RunE: RunAddLocal,
+	RunE:  RunAddLocal,
 }
 
 func init() {
@@ -167,14 +149,4 @@ func init() {
 
 	addCmd.AddCommand(addLocalCmd)
 	addCmd.AddCommand(addRemoteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

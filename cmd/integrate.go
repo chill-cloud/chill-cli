@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/integrations/remote"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"io/ioutil"
 	"path/filepath"
 
@@ -13,7 +13,7 @@ import (
 )
 
 func runIntegrateGithub(cmd *cobra.Command, args []string) error {
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}

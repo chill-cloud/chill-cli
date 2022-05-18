@@ -4,10 +4,10 @@ import (
 	"fmt"
 	cache2 "github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/integrations/server"
 	"github.com/chill-cloud/chill-cli/pkg/logging"
 	"github.com/chill-cloud/chill-cli/pkg/service"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"github.com/chill-cloud/chill-cli/pkg/validate"
 	"github.com/chill-cloud/chill-cli/pkg/version"
 	"github.com/chill-cloud/chill-cli/pkg/version/constraint"
@@ -18,11 +18,13 @@ import (
 	"path/filepath"
 )
 
-func RunSync(cmd *cobra.Command, args []string) error {
+func Sync(cwd string, local bool, gen bool) error {
 
-	// Set up working directory
+	local = local || ForceLocal
 
-	cwd, err := util.SetupCwd(Cwd)
+	// Set up cache
+
+	cacheContext, err := cache2.DefaultCacheContext()
 	if err != nil {
 		return err
 	}
@@ -35,13 +37,6 @@ func RunSync(cmd *cobra.Command, args []string) error {
 	}
 	if cfg == nil {
 		return fmt.Errorf("no project config found")
-	}
-
-	// Set up cache
-
-	cacheContext, err := cache2.DefaultCacheContext()
-	if err != nil {
-		return err
 	}
 
 	// Parse lock file (if exists)
@@ -65,7 +60,7 @@ func RunSync(cmd *cobra.Command, args []string) error {
 
 	for d, _ := range cfg.Dependencies {
 		logging.Logger.Info(fmt.Sprintf("Updating dependency %s", d.GetName()))
-		if !ForceLocal {
+		if !local {
 			err := d.Cache().Update(cacheContext)
 			if err != nil {
 				return err
@@ -104,7 +99,7 @@ func RunSync(cmd *cobra.Command, args []string) error {
 		logging.Logger.Info(fmt.Sprintf("Switched to %s", v.String()))
 	}
 
-	err = validate.ValidateGraph(cfg, cacheContext, ForceLocal)
+	err = validate.ValidateGraph(cfg, cacheContext, local)
 
 	if err != nil {
 		return fmt.Errorf("invalid service specification: %w\n", err)
@@ -211,46 +206,47 @@ func RunSync(cmd *cobra.Command, args []string) error {
 
 	logging.Logger.Info("Generating server stubs for this project...")
 	integration := server.ForName(cfg.Integration)
+	srcCwd := filepath.Join(cwd, "src")
 	if integration == nil {
 		return fmt.Errorf("no integration found for name %s", cfg.Integration)
 	}
-	err = integration.GenerateMethods(cwd, cfg.Name, cwd)
+	err = integration.GenerateMethods(srcCwd, cfg.Name, cwd)
 	if err != nil {
 		return err
 	}
 
-	for d, _ := range cfg.Dependencies {
-		err = integration.GenerateMethods(cwd, d.GetName(), d.Cache().GetPath(cacheContext))
-		if err != nil {
-			return err
+	if gen {
+		for d, _ := range cfg.Dependencies {
+			err = integration.GenerateMethods(srcCwd, d.GetName(), d.Cache().GetPath(cacheContext))
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
+func RunSync(cmd *cobra.Command, args []string) error {
+
+	// Set up working directory
+
+	cwd, err := cwd.SetupCwd(Cwd)
+	if err != nil {
+		return err
+	}
+
+	return Sync(cwd, true, true)
+}
+
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Use:   "sync",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Synchronizes local and remote state",
+	Long: `You are free to run this command as often as you want
+until you are ready to freeze`,
 	RunE: RunSync,
 }
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// syncCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// syncCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

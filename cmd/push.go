@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
 	"github.com/chill-cloud/chill-cli/pkg/config"
+	"github.com/chill-cloud/chill-cli/pkg/cwd"
 	"github.com/chill-cloud/chill-cli/pkg/logging"
-	"github.com/chill-cloud/chill-cli/pkg/util"
 	"github.com/docker/docker/api/types"
 	docker "github.com/docker/docker/client"
 	"github.com/spf13/cobra"
@@ -20,7 +20,7 @@ import (
 
 func RunPush(cmd *cobra.Command, args []string) error {
 
-	cwd, err := util.SetupCwd(Cwd)
+	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}

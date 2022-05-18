@@ -26,7 +26,7 @@ func (g *goIntegration) GenerateMethods(cwd string, name string, protoSource str
 		moduleDeclarations = append(moduleDeclarations, "--go_opt=M"+p+"=./"+name, "--go-grpc_opt=M"+p+"=./"+name)
 	}
 
-	targetPath := filepath.Join(cwd, "src", "internal", "generated")
+	targetPath := filepath.Join(cwd, "internal", "generated")
 
 	err = os.MkdirAll(targetPath, os.ModePerm)
 	if err != nil {
