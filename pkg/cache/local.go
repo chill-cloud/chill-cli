@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"errors"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/version"
 	"github.com/go-git/go-git/v5"
@@ -9,9 +10,9 @@ import (
 	"strings"
 )
 
-type NotCommitedError interface {
+type NotCommittedError interface {
 	error
-	NotCommitedFiles() []string
+	NotCommittedFiles() []string
 }
 
 type notCommitedError []string
@@ -20,7 +21,7 @@ func (e notCommitedError) Error() string {
 	return strings.Join(e, "\n")
 }
 
-func (e notCommitedError) NotCommitedFiles() []string {
+func (e notCommitedError) NotCommittedFiles() []string {
 	return e
 }
 
@@ -73,10 +74,10 @@ func (s *localSourceOfTruth) CheckVersion(v version.Version) (bool, error) {
 		return false, err
 	}
 	_, err = s.Repository.TagObject(ref.Hash())
-	switch err {
-	case nil:
+	switch {
+	case err == nil:
 		return true, nil
-	case plumbing.ErrObjectNotFound:
+	case errors.Is(err, plumbing.ErrObjectNotFound):
 		return false, nil
 	default:
 		return false, err
@@ -113,6 +114,9 @@ func (s *localSourceOfTruth) IsFrozen() (bool, error) {
 		return false, err
 	}
 	commit, err := s.Repository.CommitObject(r.Hash())
+	if err != nil {
+		return false, err
+	}
 	iter, err := s.Repository.TagObjects()
 	if err != nil {
 		return false, err

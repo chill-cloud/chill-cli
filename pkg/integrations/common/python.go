@@ -20,7 +20,7 @@ func GenerateMethodsPython(cwd string, name string, protoSource string, visibili
 		protos[i] = strings.TrimPrefix(protos[i], protoPath+"/")
 	}
 
-	targetPath := filepath.Join(cwd, "chillgen")
+	targetPath := filepath.Join(cwd, "chillgen", name)
 
 	err = os.MkdirAll(targetPath, os.ModePerm)
 	if err != nil {

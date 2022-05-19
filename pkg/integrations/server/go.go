@@ -20,7 +20,7 @@ func (g *goIntegration) GenerateMethods(cwd string, name string, protoSource str
 	for i := 0; i < len(protos); i++ {
 		protos[i] = strings.TrimPrefix(protos[i], protoPath+"/")
 	}
-	var moduleDeclarations []string
+	moduleDeclarations := []string{}
 
 	for _, p := range protos {
 		moduleDeclarations = append(moduleDeclarations, "--go_opt=M"+p+"=./"+name, "--go-grpc_opt=M"+p+"=./"+name)
@@ -58,7 +58,6 @@ func (g *goIntegration) GenerateMethods(cwd string, name string, protoSource str
 			"\n\n"+
 			"stderr:\n%s",
 			outbuf.String(), errbuf.String())
-
 	}
 	return nil
 }

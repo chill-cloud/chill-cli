@@ -94,7 +94,7 @@ func (pc *ProjectConfig) GetBuildTag(forceLocal bool) (string, bool) {
 }
 
 func (pc *ProjectConfig) UpdateDependencies(ctx cache.LocalCacheContext) error {
-	for dep, _ := range pc.Dependencies {
+	for dep := range pc.Dependencies {
 		err := dep.Cache().Update(ctx)
 		if err != nil {
 			return err

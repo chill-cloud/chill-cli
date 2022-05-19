@@ -192,7 +192,7 @@ func ProcessConfig(c *service2.ProjectConfig) (*SerializedService, error) {
 		s.CurrentVersion = c.CurrentVersion.String()
 	}
 	s.Dependencies = map[string]SerializedDependency{}
-	for dep, _ := range c.Dependencies {
+	for dep := range c.Dependencies {
 		if remote, ok := dep.(*service2.RemoteDependency); ok {
 			s.Dependencies[dep.GetName()] = SerializedDependency{
 				Remote:          remote.Git,

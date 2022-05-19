@@ -63,15 +63,13 @@ func Merge(parts []string, delimiter string, mode MergeMode) string {
 		switch mode {
 		case ModeUpperCamelCase:
 			parts[i] = capitalizeFirst(parts[i])
-			break
 		case ModeLowerCamelCase:
 			if i > 0 {
 				parts[i] = capitalizeFirst(parts[i])
 			}
-			break
 		case ModeUpper:
 			parts[i] = strings.ToTitle(parts[i])
-		default:
+		case ModeLower:
 			break
 		}
 	}

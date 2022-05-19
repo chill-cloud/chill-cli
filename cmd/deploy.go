@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	errors2 "errors"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/cluster"
@@ -47,7 +48,7 @@ func RunDeploy(cmd *cobra.Command, args []string) error {
 	}
 
 	if clean != nil {
-		return fmt.Errorf("uncomitted or untracked changes detected; commit or stash them")
+		return fmt.Errorf("uncommitted or untracked changes detected; commit or stash them")
 	}
 
 	if !forceFrozen {
@@ -107,16 +108,21 @@ func RunDeploy(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		if locked {
-			defer locker.Release(h)
+			defer func() {
+				err := locker.Release(h)
+				if err != nil {
+					panic(err)
+				}
+			}()
 			existingService, err := knative.Services(KubeNamespace).Get(context.TODO(), name, metav1.GetOptions{})
 			created := true
 			if err != nil {
-				switch err.(type) {
-				case *errors.StatusError:
-					if err.(*errors.StatusError).Status().Reason == metav1.StatusReasonNotFound {
+				var typedErr *errors.StatusError
+				switch {
+				case errors2.As(err, &typedErr):
+					if typedErr.Status().Reason == metav1.StatusReasonNotFound {
 						logging.Logger.Info("Service not created yet")
 						created = false
-
 					}
 				default:
 					return err
@@ -189,7 +195,7 @@ func RunDeploy(cmd *cobra.Command, args []string) error {
 					Value: cfg.CurrentVersion.String(),
 				},
 			}
-			for dep, _ := range cfg.Dependencies {
+			for dep := range cfg.Dependencies {
 				specificVersion := dep.GetSpecificVersion()
 				if specificVersion == nil {
 					return fmt.Errorf("specific version must be set for service %s", dep.GetName())

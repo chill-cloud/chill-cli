@@ -19,7 +19,6 @@ import (
 )
 
 func RunPush(cmd *cobra.Command, args []string) error {
-
 	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
@@ -84,7 +83,7 @@ func RunPush(cmd *cobra.Command, args []string) error {
 		}
 		encodedJSON, err := json.Marshal(authConfig)
 		if err != nil {
-			return fmt.Errorf("error when encoding authConfig. err: %v", err)
+			return fmt.Errorf("error when encoding authConfig. err: %w", err)
 		}
 
 		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
@@ -97,6 +96,9 @@ func RunPush(cmd *cobra.Command, args []string) error {
 		}
 		var out strings.Builder
 		_, err = io.Copy(&out, pushResp)
+		if err != nil {
+			return err
+		}
 		println(out.String())
 	}
 	fmt.Printf("Image pushed successfully!")

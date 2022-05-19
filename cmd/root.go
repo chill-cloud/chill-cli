@@ -42,7 +42,12 @@ func init() {
 		config.EncoderConfig.CallerKey = ""
 		config.EncoderConfig.TimeKey = ""
 		logging.Logger, _ = config.Build()
-		defer logging.Logger.Sync() // flushes buffer, if any
+		defer func() {
+			err := logging.Logger.Sync()
+			if err != nil {
+				panic(err)
+			}
+		}()
 		logging.Logger.Info("Verbose logging enabled")
 		return nil
 	}

@@ -99,6 +99,6 @@ var noRegistry = false
 
 func init() {
 	rootCmd.AddCommand(integrateCmd)
-	integrateCmd.Flags().BoolVar(&noRegistry, "no-registry", false, "Disables setting the integration regisrty")
+	integrateCmd.Flags().BoolVar(&noRegistry, "no-registry", false, "Disables setting the integration registry")
 	integrateCmd.AddCommand(integrateGithub)
 }

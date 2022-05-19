@@ -15,10 +15,8 @@ import (
 )
 
 func RunCreate(cmd *cobra.Command, args []string) error {
-
 	// No project exists for now, so no cwd lookup will be performed
 	cwd := Cwd
-
 	name := args[0]
 	base := server.DefaultServerName
 	if len(args) > 1 {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/config"
 	"github.com/chill-cloud/chill-cli/pkg/cwd"
@@ -37,7 +38,6 @@ func GetContext(filePath string) (io.Reader, error) {
 }
 
 func RunBuild(cmd *cobra.Command, args []string) error {
-
 	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func RunBuild(cmd *cobra.Command, args []string) error {
 	for {
 		var jm jsonmessage.JSONMessage
 		if err := dec.Decode(&jm); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 		}
@@ -80,7 +80,10 @@ func RunBuild(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("unable to build image: %w\n", jm.Error)
 		} else {
 			var out strings.Builder
-			jm.Display(&out, false)
+			err := jm.Display(&out, false)
+			if err != nil {
+				return err
+			}
 			res := out.String()
 			to := len(res) - 1
 			if to < 0 {

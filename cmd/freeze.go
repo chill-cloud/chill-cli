@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	errors2 "errors"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/config"
@@ -36,9 +37,10 @@ func RunFreeze(cmd *cobra.Command, args []string) error {
 
 	err = s.FreezeVersion(*cfg.CurrentVersion)
 	if err != nil {
-		if notCommited, ok := err.(cache.NotCommitedError); ok {
-			return fmt.Errorf("some changes have not been commited, only commited versions can be frozen;\n"+
-				"problematic files:\n\n%s", strings.Join(notCommited.NotCommitedFiles(), "\n"))
+		var typedErr cache.NotCommittedError
+		if errors2.As(err, &typedErr) {
+			return fmt.Errorf("some changes have not been committed, only committed versions can be frozen;\n"+
+				"problematic files:\n\n%s", strings.Join(typedErr.NotCommittedFiles(), "\n"))
 		}
 		return err
 	}

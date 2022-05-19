@@ -43,7 +43,7 @@ func (i *githubIntegration) SetSecret(key string, value string) error {
 	}
 
 	if _, err := client.Actions.CreateOrUpdateRepoSecret(context.TODO(), i.Owner, i.Repo, encryptedSecret); err != nil {
-		return fmt.Errorf("Actions.CreateOrUpdateRepoSecret returned error: %v", err)
+		return fmt.Errorf("Actions.CreateOrUpdateRepoSecret returned error: %w", err)
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (i *githubIntegration) SetSecret(key string, value string) error {
 func encryptSecretWithPublicKey(publicKey *github.PublicKey, secretName string, secretValue string) (*github.EncryptedSecret, error) {
 	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("base64.StdEncoding.DecodeString was unable to decode public key: %v", err)
+		return nil, fmt.Errorf("base64.StdEncoding.DecodeString was unable to decode public key: %w", err)
 	}
 
 	var rand io.Reader

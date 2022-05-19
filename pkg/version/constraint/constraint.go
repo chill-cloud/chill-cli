@@ -67,6 +67,9 @@ func ParseFromString(str string) (Constraint, error) {
 			}, nil
 		}
 		minor, err := version.ParseVersionPart(parts[1])
+		if err != nil {
+			return nil, err
+		}
 		if len(parts) == 2 {
 			return &AnnotatedConstraint{
 				C: New(
@@ -76,6 +79,9 @@ func ParseFromString(str string) (Constraint, error) {
 			}, nil
 		}
 		patch, err := version.ParseVersionPart(parts[2])
+		if err != nil {
+			return nil, err
+		}
 		if len(parts) == 3 {
 			return &AnnotatedConstraint{
 				C: New(

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	errors2 "errors"
 	"fmt"
 	"github.com/chill-cloud/chill-cli/pkg/logging"
 	"github.com/chill-cloud/chill-cli/pkg/service/naming"
@@ -107,9 +108,10 @@ func (k *kubernetesClusterManager) setSecret(key string, value string, mapKey st
 	secret, err := secretsInterface.Get(context.TODO(), key, v12.GetOptions{})
 	created := true
 	if err != nil {
-		switch err.(type) {
-		case *errors.StatusError:
-			if err.(*errors.StatusError).Status().Reason == v12.StatusReasonNotFound {
+		var typedError *errors.StatusError
+		switch {
+		case errors2.As(err, &typedError):
+			if typedError.Status().Reason == v12.StatusReasonNotFound {
 				logging.Logger.Info("Service not created yet")
 				created = false
 			}
@@ -180,7 +182,7 @@ func (k *kubernetesClusterManager) GetRegistry(serviceName string, server string
 	}
 	parts := strings.Split(string(res), ":")
 	if len(parts) != 2 {
-		return "", "", fmt.Errorf("wrong Kubernetes regisrty value format")
+		return "", "", fmt.Errorf("wrong Kubernetes registry value format")
 	}
 	return parts[0], parts[1], nil
 }

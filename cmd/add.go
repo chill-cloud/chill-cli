@@ -46,7 +46,8 @@ func RunAddLocal(cmd *cobra.Command, args []string) error {
 		})
 }
 
-func runAddGeneric(src cache.CachedSource, version *string, f func(string, constraint.Constraint) service2.Dependency) error {
+func runAddGeneric(src cache.CachedSource, version *string,
+	f func(string, constraint.Constraint) service2.Dependency) error {
 	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
@@ -76,7 +77,7 @@ func runAddGeneric(src cache.CachedSource, version *string, f func(string, const
 		return fmt.Errorf("unable to parse a lock file of the dependency")
 	}
 
-	for dep, _ := range cfg.Dependencies {
+	for dep := range cfg.Dependencies {
 		if dep.GetName() == depCfg.Name {
 			return fmt.Errorf("dependency already present")
 		}

@@ -48,7 +48,7 @@ func (c *SccContext) dfsOut(v string) {
 
 func (c *SccContext) FindScc() [][]string {
 	c.visited = map[string]bool{}
-	for v, _ := range c.Adj {
+	for v := range c.Adj {
 		if !c.visited[v] {
 			c.dfsIn(v)
 		}
@@ -67,7 +67,6 @@ func (c *SccContext) FindScc() [][]string {
 }
 
 func ValidateGraph(pc *service.ProjectConfig, c cache.LocalCacheContext, forceLocal bool) error {
-
 	adj := map[string][]string{}
 	rev := map[string][]string{}
 
@@ -78,13 +77,16 @@ func ValidateGraph(pc *service.ProjectConfig, c cache.LocalCacheContext, forceLo
 	rev[pc.Name] = []string{}
 	for stack.Len() > 0 {
 		back := stack.Back()
-		cur := back.Value.(*service.ProjectConfig)
+		cur, ok := back.Value.(*service.ProjectConfig)
+		if !ok {
+			return fmt.Errorf("wrong type")
+		}
 		stack.Remove(back)
 
 		visited[cur.Name] = true
 		logging.Logger.Info(cur.Name)
 
-		for dep, _ := range cur.Dependencies {
+		for dep := range cur.Dependencies {
 			if !forceLocal {
 				err := dep.Cache().Update(c)
 				if err != nil {

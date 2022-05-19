@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	errors2 "errors"
 	"fmt"
 	cache2 "github.com/chill-cloud/chill-cli/pkg/cache"
 	"github.com/chill-cloud/chill-cli/pkg/config"
@@ -19,7 +20,6 @@ import (
 )
 
 func Sync(cwd string, local bool, gen bool) error {
-
 	local = local || ForceLocal
 
 	// Set up cache
@@ -51,14 +51,13 @@ func Sync(cwd string, local bool, gen bool) error {
 
 	// Copy changes from the config to the lock file
 
-	err = cfg.ApplyIdempotent(lockCfg)
-	if err != nil {
+	if err := cfg.ApplyIdempotent(lockCfg); err != nil {
 		return err
 	}
 
 	// Set actual versions of dependencies
 
-	for d, _ := range cfg.Dependencies {
+	for d := range cfg.Dependencies {
 		logging.Logger.Info(fmt.Sprintf("Updating dependency %s", d.GetName()))
 		if !local {
 			err := d.Cache().Update(cacheContext)
@@ -156,7 +155,8 @@ func Sync(cwd string, local bool, gen bool) error {
 		)
 		_, err = q.Output()
 		if err != nil {
-			if exiterr, ok := err.(*exec.ExitError); ok && exiterr.ExitCode() == 100 {
+			var exitErr *exec.ExitError
+			if errors2.As(err, &exitErr); exitErr.ExitCode() == 100 {
 				println("Breaking changes detected! Incrementing major version")
 				cfg.Stage = service.StageMajor
 			} else {
@@ -178,7 +178,6 @@ func Sync(cwd string, local bool, gen bool) error {
 						"It is an unusual situation, and is a sign that development process is out of sync.\n" +
 						"We suggest to get into touch with latest changes of the project before writing the code.")
 			}
-			break
 		case service.StageDevelopment:
 			v := versionSet.GetLatestVersion(constraint.New(*cfg.BaseVersion,
 				version.Version{
@@ -216,7 +215,7 @@ func Sync(cwd string, local bool, gen bool) error {
 	}
 
 	if gen {
-		for d, _ := range cfg.Dependencies {
+		for d := range cfg.Dependencies {
 			err = integration.GenerateMethods(srcCwd, d.GetName(), d.Cache().GetPath(cacheContext))
 			if err != nil {
 				return err
@@ -227,14 +226,11 @@ func Sync(cwd string, local bool, gen bool) error {
 }
 
 func RunSync(cmd *cobra.Command, args []string) error {
-
 	// Set up working directory
-
 	cwd, err := cwd.SetupCwd(Cwd)
 	if err != nil {
 		return err
 	}
-
 	return Sync(cwd, true, true)
 }
 
